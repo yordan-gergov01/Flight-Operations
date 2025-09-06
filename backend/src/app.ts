@@ -5,8 +5,8 @@ import morgan from "morgan";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 
-import AppError from "./src/utils/appError";
-import globalErrorHandler from "./src/middlewares/globalErrorHandler";
+import AppError from "./utils/appError";
+import globalErrorHandler from "./middlewares/globalErrorHandler";
 
 const app = express();
 
