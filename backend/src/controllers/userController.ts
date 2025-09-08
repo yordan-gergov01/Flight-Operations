@@ -15,7 +15,7 @@ const getUsers = catchAsync(async function (req: Request, res: Response) {
   });
 });
 
-const getProfile = catchAsync(async function (
+const getOneUser = catchAsync(async function (
   req: Request,
   res: Response,
   next: NextFunction
@@ -72,4 +72,4 @@ const deleteUser = catchAsync(async function (
   });
 });
 
-export { getUsers, getProfile, updateUser, deleteUser };
+export { getUsers, getOneUser, updateUser, deleteUser };

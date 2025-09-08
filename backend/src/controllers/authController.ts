@@ -71,6 +71,9 @@ const signUp = catchAsync(async function (
     );
   }
 
+  const allUsers = await UserModel.getAllUsers();
+  const role = allUsers.length === 0 ? "admin" : "user";
+
   const existingUser = await UserModel.getUserByEmail(email);
 
   if (existingUser) {
@@ -81,6 +84,7 @@ const signUp = catchAsync(async function (
     const newUser = await UserModel.createNewUser({
       username,
       email,
+      role,
       password_hash: password,
     });
 
@@ -127,4 +131,16 @@ const logout = function (req: Request, res: Response) {
   });
 };
 
-export { signUp, login, logout };
+const restrictTo = function (...roles: string[]) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return next(
+        new AppError("You do not have permission to perform this action.", 403)
+      );
+    }
+
+    next();
+  };
+};
+
+export { signUp, login, logout, restrictTo };

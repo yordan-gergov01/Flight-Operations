@@ -1,9 +1,14 @@
 import express from "express";
 
-import { signUp, login, logout } from "../controllers/authController";
+import {
+  signUp,
+  login,
+  logout,
+  restrictTo,
+} from "../controllers/authController";
 import {
   getUsers,
-  getProfile,
+  getOneUser,
   updateUser,
   deleteUser,
 } from "../controllers/userController";
@@ -15,11 +20,18 @@ const userRouter = express.Router();
 userRouter.post("/signup", signUp);
 userRouter.post("login", login);
 userRouter.get("/logout", logout);
+// TODO: add login for forgot password and reset password
 
+// for the next routes the authentication is must
+// because middlewares runs in sequence
 userRouter.use(protect);
 
-userRouter.get("/me", getProfile);
+userRouter.get("/me", getOneUser);
+// TODO: add here logic for user that can delete its profile, update its password
 
-// TODO: add admin role with logic to restrict updateUser, getAllUsers, deleteUser
+userRouter.use(restrictTo("admin"));
+
+userRouter.route("/").get(getUsers);
+userRouter.route("/:id").patch(updateUser).delete(deleteUser);
 
 export default userRouter;
