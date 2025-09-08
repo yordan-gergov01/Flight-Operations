@@ -1,7 +1,7 @@
 import * as jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-import { Response, CookieOptions } from "express";
+import { Request, Response, CookieOptions, NextFunction } from "express";
 
 import * as UserModel from "../models/User";
 
@@ -23,6 +23,10 @@ const createSendToken = function (
   statusCode: number,
   res: Response
 ) {
+  if (!user.id) {
+    throw new Error("User ID missing for token generation.");
+  }
+
   const token = signToken(user.id);
 
   const cookieOptions: CookieOptions = {
@@ -53,3 +57,74 @@ const createSendToken = function (
     user: sanitizedUser,
   });
 };
+
+const signUp = catchAsync(async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { username, email, password } = req.body;
+
+  if (!username || !email || !password) {
+    return next(
+      new AppError("Username, email, and password are required.", 400)
+    );
+  }
+
+  const existingUser = await UserModel.getUserByEmail(email);
+
+  if (existingUser) {
+    return next(new AppError("User already exists.", 400));
+  }
+
+  try {
+    const newUser = await UserModel.createNewUser({
+      username,
+      email,
+      password_hash: password,
+    });
+
+    createSendToken(newUser, 201, res);
+  } catch (error: any) {
+    return next(new AppError(error.message, 403));
+  }
+});
+
+const login = catchAsync(async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return next(new AppError("Email and password are required.", 400));
+  }
+
+  const user = await UserModel.getUserByEmail(email);
+
+  if (!user) {
+    return next(new AppError("Email is not correct.", 401));
+  }
+
+  const isPasswordMatch = await bcrypt.compare(password, user.password_hash);
+
+  if (!isPasswordMatch) {
+    return next(new AppError("Password is not correct.", 401));
+  }
+
+  createSendToken(user, 200, res);
+});
+
+const logout = function (req: Request, res: Response) {
+  res.cookie("jwt", "loggedout", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+
+  res.status(200).json({
+    status: "success",
+  });
+};
+
+export { signUp, login, logout };

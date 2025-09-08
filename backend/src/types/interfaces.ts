@@ -1,9 +1,11 @@
+import { JwtPayload } from "jsonwebtoken";
+
 export interface User {
-  id: number;
+  id?: number;
   username: string;
   email: string;
   password_hash: string;
-  role: string;
+  role?: string;
   created_at?: Date;
 }
 
@@ -59,4 +61,8 @@ export interface Alert {
   request2_id: number;
   type: string;
   created_at: Date;
+}
+
+export interface JwtPayloadWithId extends JwtPayload {
+  id: number;
 }

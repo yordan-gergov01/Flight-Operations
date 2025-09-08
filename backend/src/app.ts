@@ -8,6 +8,8 @@ import cookieParser from "cookie-parser";
 import AppError from "./utils/appError";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
 
+import userRouter from "./routes/userRoutes";
+
 const app = express();
 
 app.use(express.json({ limit: "1mb" }));
@@ -26,6 +28,7 @@ const limiter = rateLimit({
 });
 
 app.use("/api", limiter);
+app.use("/api/users", userRouter);
 
 app.get("/health", (req: Request, res: Response) => {
   res.json({ message: "OK" });

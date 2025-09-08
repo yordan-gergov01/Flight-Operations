@@ -1,5 +1,5 @@
 import { User } from "../types/interfaces";
-import { PublicUser, UserUpdate } from "../types/types";
+import { PublicUser, UserUpdate } from "../types/user/user-type";
 
 import db from "../config/db";
 import bcrypt from "bcrypt";
