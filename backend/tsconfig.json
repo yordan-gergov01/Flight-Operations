@@ -7,10 +7,16 @@
     "outDir": "dist",
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
   },
   "ts-node": {
     "transpileOnly": true,
-    "esm": true
-  }
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  },
+  "include": ["src/**/*", "knexfile.ts"],
+  "exclude": ["node_modules", "dist"]
 }

@@ -1,14 +1,26 @@
 import { Knex } from "knex";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 import csv from "csv-parser";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export async function seed(knex: Knex): Promise<void> {
   // first we need to clear available data
   await knex("airports").del();
 
+  console.log("Seed function");
+
   const airports: any[] = [];
-  const filePath = path.join(__dirname, "..", "data", "airports.csv");
+  const filePath = path.join(
+    __dirname,
+    "..",
+    "data",
+    "airports",
+    "airports.csv"
+  );
 
   await new Promise<void>((resolve, reject) => {
     const readAirportsStream = fs.createReadStream(filePath);
@@ -17,11 +29,12 @@ export async function seed(knex: Knex): Promise<void> {
       .pipe(csv())
       .on("data", (row) => {
         if (row.ident && row.type === "large_airport") {
+          // that's the format we expect in the database
           airports.push({
             icao_code: row.ident,
             name: row.name,
-            city: row.municipality || null,
-            country: row.iso_country || null,
+            city: row.municipality || "Default city",
+            country: row.iso_country || "Default country",
             latitude: row.latitude_deg,
             longitude: row.longitude_deg,
           });
