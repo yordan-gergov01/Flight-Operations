@@ -8,7 +8,7 @@ import * as UserModel from "../models/User";
 import AppError from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
 
-import { User } from "../types/interfaces";
+import { User } from "../types/general-interfaces";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1h";

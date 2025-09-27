@@ -1,4 +1,4 @@
-import { User } from "../interfaces";
+import { User } from "../general-interfaces";
 
 export type PublicUser = Pick<User, "id" | "username" | "email" | "role">;
 export type UserUpdate = Partial<

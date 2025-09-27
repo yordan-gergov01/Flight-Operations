@@ -1,4 +1,4 @@
-import { User } from "../types/interfaces";
+import { User } from "../types/general-interfaces";
 import { PublicUser, UserUpdate } from "../types/user/user-type";
 
 import db from "../config/db";

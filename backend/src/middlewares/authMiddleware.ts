@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 import { Request, Response, NextFunction } from "express";
-import { JwtPayloadWithId } from "../types/interfaces";
+import { JwtPayloadWithId } from "../types/general-interfaces";
 
 import AppError from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
