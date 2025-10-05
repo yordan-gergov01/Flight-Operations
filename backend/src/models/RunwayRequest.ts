@@ -38,7 +38,7 @@ const updateRunwayRequest = async function ({
   status,
 }: UpdateRunwayRequestInput): Promise<RunwayRequest> {
   const [updatedRequest] = await db<RunwayRequest>("runway_requests")
-    .where({ id })
+    .where("id", id)
     .update({ status })
     .returning("*");
 

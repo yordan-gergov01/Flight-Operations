@@ -9,6 +9,7 @@ import AppError from "./utils/appError";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
 
 import userRouter from "./routes/userRoutes";
+import runwayRequestsRouter from "./routes/runwayRequestsRoutes";
 
 const app = express();
 
@@ -29,6 +30,7 @@ const limiter = rateLimit({
 
 app.use("/api", limiter);
 app.use("/api/users", userRouter);
+app.use("/api/runway-requests", runwayRequestsRouter);
 
 app.get("/health", (req: Request, res: Response) => {
   res.json({ message: "OK" });

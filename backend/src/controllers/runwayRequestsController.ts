@@ -5,6 +5,8 @@ import * as RunwayRequestsModel from "../models/RunwayRequest";
 import catchAsync from "../utils/catchAsync";
 import AppError from "../utils/appError";
 
+import { RequestStatus } from "../types/runway-requests/runway-request-types";
+
 const createNewRequest = catchAsync(async function (
   req: Request,
   res: Response,
@@ -39,8 +41,10 @@ const getRequestsByStatus = catchAsync(async function (
 ) {
   const { status } = req.query;
 
+  const typedStatus = status as RequestStatus;
+
   const requestsByStatus = await RunwayRequestsModel.getRequestsWithStatus(
-    status
+    typedStatus
   );
 
   res.status(200).json({
@@ -58,9 +62,12 @@ const updateRunwayRequest = catchAsync(async function (
 ) {
   const { id } = req.params;
   const { status } = req.query;
+
+  const typedStatus = status as RequestStatus;
+
   const updatedRequest = await RunwayRequestsModel.updateRunwayRequest({
     id,
-    status,
+    status: typedStatus,
   });
 
   if (!updatedRequest) {
