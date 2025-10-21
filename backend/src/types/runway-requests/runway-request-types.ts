@@ -1,4 +1,4 @@
-interface BaseRunwayRequest {
+export interface BaseRunwayRequest {
   flight_id: any;
   runway_id: any;
   user_id: any;
@@ -10,7 +10,7 @@ export type RequestStatus = "pending" | "approved" | "denied";
 export interface RunwayRequest extends BaseRunwayRequest {
   id: number | string;
   requested_time: Date;
-  status: RequestStatus;
+  status?: RequestStatus | string;
 }
 
 export type CreateRunwayRequestInput = BaseRunwayRequest;

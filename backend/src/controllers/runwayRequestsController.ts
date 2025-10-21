@@ -7,6 +7,11 @@ import AppError from "../utils/appError";
 
 import { RequestStatus } from "../types/runway-requests/runway-request-types";
 
+import {
+  enqueueRequest,
+  updateRequestByStatus,
+} from "../services/runway-request-service";
+
 const createNewRequest = catchAsync(async function (
   req: Request,
   res: Response,
@@ -19,7 +24,7 @@ const createNewRequest = catchAsync(async function (
     return next(new AppError("Unauthorized", 401));
   }
 
-  const request = await RunwayRequestsModel.createRunwayRequest({
+  const request = await enqueueRequest({
     flight_id,
     runway_id,
     user_id: userId,
@@ -65,7 +70,7 @@ const updateRunwayRequest = catchAsync(async function (
 
   const typedStatus = status as RequestStatus;
 
-  const updatedRequest = await RunwayRequestsModel.updateRunwayRequest({
+  const updatedRequest = await updateRequestByStatus({
     id,
     status: typedStatus,
   });
