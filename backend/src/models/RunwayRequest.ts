@@ -1,5 +1,6 @@
-import { RunwayRequest } from "../types/general-interfaces";
 import db from "../config/db";
+
+import { RunwayRequest } from "../types/general-interfaces";
 
 import {
   CreateRunwayRequestInput,
