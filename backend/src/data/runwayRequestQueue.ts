@@ -1,6 +1,6 @@
 import { RunwayRequest } from "../types/runway-requests/runway-request-types";
 
-export class RunwayQueue {
+class RunwayQueue {
   private queue: Map<string, RunwayRequest> = new Map();
 
   enqueue(request: RunwayRequest) {
