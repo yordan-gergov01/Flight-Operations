@@ -10,6 +10,7 @@ import globalErrorHandler from "./middlewares/globalErrorHandler";
 
 import userRouter from "./routes/userRoutes";
 import runwayRequestsRouter from "./routes/runwayRequestsRoutes";
+import historyEventsRouter from "./routes/historyEventsRoutes";
 
 const app = express();
 
@@ -31,6 +32,7 @@ const limiter = rateLimit({
 app.use("/api", limiter);
 app.use("/api/users", userRouter);
 app.use("/api/runway-requests", runwayRequestsRouter);
+app.use("/api/history", runwayRequestsRouter);
 
 app.get("/health", (req: Request, res: Response) => {
   res.json({ message: "OK" });
