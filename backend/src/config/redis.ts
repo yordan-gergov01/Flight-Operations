@@ -1,7 +1,7 @@
 import { RedisClientOptions } from "redis";
 import logger from "../utils/logger";
 
-export const RedisConfig: RedisClientOptions = {
+export const redisConfig: RedisClientOptions = {
   socket: {
     host: process.env.REDIS_HOST,
     port: Number(process.env.REDIS_PORT),
