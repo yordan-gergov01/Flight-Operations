@@ -1,26 +1,38 @@
 import dotenv from "dotenv";
-import app from "./app";
-
-// triggered when an exception occurs in synchronous code and is not handled by try...catch
-process.on("uncaughtException", (err: any) => {
-  console.log(err.name, err.message);
-
-  process.exit(1);
-});
+import app, { initializeRedis } from "./app";
+import logger from "./utils/logger";
 
 dotenv.config({ path: "./.env" });
 
+// triggered when an exception occurs in synchronous code and is not handled by try...catch
+process.on("uncaughtException", (err: any) => {
+  logger.error("UNCAUGHT EXCEPTION! Shutting down...", err);
+  process.exit(1);
+});
+
 const PORT = process.env.APP_PORT || 3005;
 
-const server = app.listen(PORT, () => {
-  console.log(`Server started at port ${PORT}...`);
-});
+const startServer = async () => {
+  try {
+    await initializeRedis();
 
-// triggered when there is a raw Promise rejection
-process.on("unhandledRejection", (err: any) => {
-  console.log(err.name, err.message);
+    const server = app.listen(PORT, () => {
+      logger.info(`Server running on port ${PORT}`);
+      logger.info(`Environment: ${process.env.NODE_ENV || "development"}`);
+    });
 
-  server.close(() => {
+    // triggered when there is a raw Promise rejection
+    process.on("unhandledRejection", (reason: any) => {
+      logger.error("UNHANDLED REJECTION! Shutting down...", reason);
+
+      server.close(() => {
+        process.exit(1);
+      });
+    });
+  } catch (error) {
+    logger.error("Failed to start server:", error);
     process.exit(1);
-  });
-});
+  }
+};
+
+startServer();

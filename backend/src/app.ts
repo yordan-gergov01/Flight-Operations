@@ -7,6 +7,8 @@ import cookieParser from "cookie-parser";
 
 import AppError from "./utils/appError";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
+import logger from "./utils/logger";
+import redisService from "./services/redis-service";
 
 import userRouter from "./routes/userRoutes";
 import runwayRequestsRouter from "./routes/runwayRequestsRoutes";
@@ -23,6 +25,18 @@ app.use(cookieParser());
 app.use(cors());
 app.use(morgan("combined"));
 
+if (process.env.NODE_ENV === "production") {
+  app.use(
+    morgan("combined", {
+      stream: {
+        write: (message: string) => logger.info(message.trim()),
+      },
+    })
+  );
+} else {
+  app.use(morgan("dev"));
+}
+
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
@@ -34,8 +48,19 @@ app.use("/api/users", userRouter);
 app.use("/api/runway-requests", runwayRequestsRouter);
 app.use("/api/history", historyEventsRouter);
 
-app.get("/health", (req: Request, res: Response) => {
-  res.json({ message: "OK" });
+app.get("/health", async (req: Request, res: Response) => {
+  const redisHealthy = await redisService.ping();
+
+  const health = {
+    status: redisHealthy ? "healthy" : "degraded",
+    timestamp: new Date().toISOString(),
+    services: {
+      api: "healthy",
+      redis: redisHealthy ? "healthy" : "unavailable",
+    },
+  };
+
+  res.status(redisHealthy ? 200 : 503).json(health);
 });
 
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -43,5 +68,26 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use(globalErrorHandler);
+
+export const initializeRedis = async () => {
+  try {
+    await redisService.connect();
+    logger.info("Redis initialized successfully");
+  } catch (error) {
+    logger.error("Failed to initialize Redis:", error);
+    logger.warn("Application will continue without Redis caching");
+  }
+};
+
+export const gracefulShutdown = async () => {
+  logger.info("Shutting down gracefully...");
+
+  await redisService.disconnect();
+
+  process.exit(0);
+};
+
+process.on("SIGTERM", gracefulShutdown);
+process.on("SIGINT", gracefulShutdown);
 
 export default app;

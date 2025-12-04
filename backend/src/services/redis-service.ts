@@ -1,10 +1,13 @@
+import { createClient } from "redis";
 import { redisConfig, cacheConfig } from "../config/redis";
+
 import logger from "../utils/logger";
 import AppError from "../utils/appError";
-import { createClient, RedisClientType } from "redis";
+
+import { RedisClient } from "../types/redis/redis-types";
 
 class RedisService {
-  private client: RedisClientType | null = null;
+  private client: RedisClient | null = null;
   private isConnected: boolean = false;
   private reconnectAttempts: number = 0;
   private readonly MAX_RECONNECT_ATTEMPTS = 5;
@@ -73,7 +76,7 @@ class RedisService {
     }
   }
 
-  getClient(): RedisClientType {
+  getClient(): RedisClient {
     if (!cacheConfig.enabled) {
       throw new AppError("Redis is disabled", 503);
     }
@@ -85,7 +88,7 @@ class RedisService {
     return this.client;
   }
 
-  isReady(): boolean {
+  isReady() {
     return cacheConfig.enabled && this.isConnected;
   }
 
@@ -100,4 +103,35 @@ class RedisService {
       return false;
     }
   }
+
+  /**
+   * Safe execute wrapper for Redis operations
+   * Returns fallback value on error instead of throwing
+   */
+  async safeExecute<T>(
+    operation: () => Promise<T>,
+    fallbackValue: T,
+    operationName: string
+  ): Promise<T> {
+    try {
+      if (!cacheConfig.enabled) {
+        return fallbackValue;
+      }
+
+      if (!this.isConnected) {
+        logger.debug(`Redis not connected, skipping ${operationName}`);
+        return fallbackValue;
+      }
+
+      return await operation();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      logger.error(`Redis operation ${operationName} failed: ${message}`);
+      return fallbackValue;
+    }
+  }
 }
+
+const redisService = new RedisService();
+
+export default redisService;

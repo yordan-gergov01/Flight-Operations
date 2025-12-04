@@ -9,7 +9,6 @@ const getUsers = catchAsync(async function (req: Request, res: Response) {
   const users = await UserModel.getAllUsers();
 
   res.status(200).json({
-    status: "success",
     length: users.length,
     users,
   });
@@ -28,7 +27,6 @@ const getOneUser = catchAsync(async function (
   }
 
   res.status(200).json({
-    status: "success",
     data: {
       user,
     },

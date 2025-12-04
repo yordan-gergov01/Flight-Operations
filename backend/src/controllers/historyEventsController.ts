@@ -39,7 +39,6 @@ const getAllEvents = function (
 
   if (typeof events === "string") {
     res.status(200).json({
-      status: "success",
       message: events, // in this case the value of events is string 'History stack is empty.'
       data: {
         events: [],
@@ -49,7 +48,6 @@ const getAllEvents = function (
   }
 
   res.status(200).json({
-    status: "success",
     data: {
       events,
     },
@@ -65,7 +63,6 @@ const getLastEvent = function (
 
   if (typeof event === "string") {
     res.status(200).json({
-      status: "success",
       message: event, // in this case the value of events is string 'History stack is empty.'
       data: {
         event: [],
@@ -75,7 +72,6 @@ const getLastEvent = function (
   }
 
   res.status(200).json({
-    status: "success",
     data: {
       event,
     },

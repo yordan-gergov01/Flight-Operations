@@ -32,7 +32,6 @@ const createNewRequest = catchAsync(async function (
   });
 
   res.status(201).json({
-    status: "success",
     data: {
       request,
     },
@@ -53,7 +52,6 @@ const getRequestsByStatus = catchAsync(async function (
   );
 
   res.status(200).json({
-    status: "success",
     data: {
       requests: requestsByStatus,
     },
@@ -80,7 +78,6 @@ const updateRunwayRequest = catchAsync(async function (
   }
 
   res.status(200).json({
-    status: "success",
     data: {
       request: updatedRequest,
     },

@@ -52,7 +52,6 @@ const createSendToken = function (
   };
 
   res.status(statusCode).json({
-    status: "success",
     token,
     user: sanitizedUser,
   });
@@ -126,9 +125,7 @@ const logout = function (req: Request, res: Response) {
     httpOnly: true,
   });
 
-  res.status(200).json({
-    status: "success",
-  });
+  res.status(200);
 };
 
 const restrictTo = function (...roles: string[]) {
