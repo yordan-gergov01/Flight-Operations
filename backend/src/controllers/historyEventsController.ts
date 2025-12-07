@@ -8,6 +8,8 @@ import {
   getStackedHistoryEvents,
   getLastHistoryEvent,
 } from "../services/history-service";
+import cacheService from "../services/cache-service";
+import { cacheConfig } from "../config/redis";
 
 const createHistoryEvent = catchAsync(async function (
   req: Request,
@@ -22,6 +24,10 @@ const createHistoryEvent = catchAsync(async function (
 
   const event = await addHistoryEvent({ request_id, event_time, outcome });
 
+  await cacheService.deletePattern("history:*").catch((error) => {
+    console.error("Failed to invalidate history cache:", error);
+  });
+
   res.status(201).json({
     status: "success",
     data: {
@@ -30,11 +36,23 @@ const createHistoryEvent = catchAsync(async function (
   });
 });
 
-const getAllEvents = function (
+const getAllEvents = catchAsync(async function (
   req: Request,
   res: Response,
   next: NextFunction
 ) {
+  const cacheKey = "history:all";
+
+  const cachedEvents = await cacheService.get(cacheKey);
+
+  if (cachedEvents) {
+    return res.status(200).json({
+      data: {
+        events: cachedEvents,
+      },
+    });
+  }
+
   const events = getStackedHistoryEvents();
 
   if (typeof events === "string") {
@@ -47,18 +65,36 @@ const getAllEvents = function (
     return;
   }
 
+  await cacheService
+    .set(cacheKey, events, cacheConfig.ttl.short)
+    .catch((error) => {
+      console.error("Failed to cache history events: ", error);
+    });
+
   res.status(200).json({
     data: {
       events,
     },
   });
-};
+});
 
-const getLastEvent = function (
+const getLastEvent = catchAsync(async function (
   req: Request,
   res: Response,
   next: NextFunction
 ) {
+  const cacheKey = "history:last";
+
+  const cachedEvent = await cacheService.get(cacheKey);
+
+  if (cachedEvent) {
+    return res.status(200).json({
+      data: {
+        event: cachedEvent,
+      },
+    });
+  }
+
   const event = getLastHistoryEvent();
 
   if (typeof event === "string") {
@@ -71,11 +107,15 @@ const getLastEvent = function (
     return;
   }
 
+  await cacheService.set(cacheKey, event, 60).catch((err) => {
+    console.error("Failed to cache last history event:", err);
+  });
+
   res.status(200).json({
     data: {
       event,
     },
   });
-};
+});
 
 export { createHistoryEvent, getAllEvents, getLastEvent };
