@@ -5,7 +5,6 @@ import app, { initializeRedis } from "./app";
 
 import logger from "./utils/logger";
 import socketService from "./services/socket-service";
-import { http } from "winston";
 
 dotenv.config({ path: "./.env" });
 
@@ -19,6 +18,7 @@ const PORT = process.env.APP_PORT || 3005;
 
 const httpServer = createServer(app);
 
+// connecting socket.io to http server
 socketService.initialize(httpServer);
 
 const startServer = async () => {
