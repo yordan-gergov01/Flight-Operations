@@ -9,6 +9,8 @@ import {
   getLastHistoryEvent,
 } from "../services/history-service";
 import cacheService from "../services/cache-service";
+import socketService from "../services/socket-service";
+
 import { cacheConfig } from "../config/redis";
 
 const createHistoryEvent = catchAsync(async function (
@@ -27,6 +29,8 @@ const createHistoryEvent = catchAsync(async function (
   await cacheService.deletePattern("history:*").catch((error) => {
     console.error("Failed to invalidate history cache:", error);
   });
+
+  socketService.emitNewHistoryEvent(event);
 
   res.status(201).json({
     status: "success",

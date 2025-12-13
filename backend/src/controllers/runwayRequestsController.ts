@@ -14,6 +14,7 @@ import {
   updateRequestByStatus,
 } from "../services/runway-request-service";
 import cacheService from "../services/cache-service";
+import socketService from "../services/socket-service";
 
 const createNewRequest = catchAsync(async function (
   req: Request,
@@ -37,6 +38,8 @@ const createNewRequest = catchAsync(async function (
   await cacheService.deletePattern("runway:requests:*").catch((error) => {
     console.error("Failed to invalidate runway requests cache:", error);
   });
+
+  socketService.emitNewRunwayRequest(request);
 
   res.status(201).json({
     data: {
@@ -105,6 +108,8 @@ const updateRunwayRequest = catchAsync(async function (
   await cacheService.deletePattern("runway:requests:*").catch((error) => {
     console.error("Failed to invalidate runway requests cache:", error);
   });
+
+  socketService.emitRunwayRequestUpdate(updatedRequest);
 
   res.status(200).json({
     data: {

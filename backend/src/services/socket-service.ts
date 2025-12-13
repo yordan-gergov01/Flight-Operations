@@ -88,19 +88,6 @@ class SocketService {
   }
 
   /**
-   * Emits a delete event for a runway request.
-   * Notifies clients to remove the request by its ID.
-   *
-   * @param {string} requestId - The ID of the runway request to delete.
-   */
-  emitRunwayRequestDelete(requestId: string) {
-    if (!this.io) return;
-
-    this.io.to("runway-updates").emit("runway:delete", { requestId });
-    logger.debug("Emitted runway:delete event", requestId);
-  }
-
-  /**
    * Emits a new history event to all clients subscribed
    * to the "history-updates" room.
    *
@@ -165,4 +152,6 @@ class SocketService {
   }
 }
 
-export default new SocketService();
+const socketService = new SocketService();
+
+export default socketService;
