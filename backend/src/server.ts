@@ -1,6 +1,11 @@
 import dotenv from "dotenv";
+import { createServer } from "http";
+
 import app, { initializeRedis } from "./app";
+
 import logger from "./utils/logger";
+import socketService from "./services/socket-service";
+import { http } from "winston";
 
 dotenv.config({ path: "./.env" });
 
@@ -12,11 +17,15 @@ process.on("uncaughtException", (err: any) => {
 
 const PORT = process.env.APP_PORT || 3005;
 
+const httpServer = createServer(app);
+
+socketService.initialize(httpServer);
+
 const startServer = async () => {
   try {
     await initializeRedis();
 
-    const server = app.listen(PORT, () => {
+    httpServer.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`);
       logger.info(`Environment: ${process.env.NODE_ENV || "development"}`);
     });
@@ -25,7 +34,7 @@ const startServer = async () => {
     process.on("unhandledRejection", (reason: any) => {
       logger.error("UNHANDLED REJECTION! Shutting down...", reason);
 
-      server.close(() => {
+      httpServer.close(() => {
         process.exit(1);
       });
     });
