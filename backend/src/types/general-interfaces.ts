@@ -66,3 +66,39 @@ export interface Alert {
 export interface JwtPayloadWithId extends JwtPayload {
   id: number;
 }
+
+export interface OpenSkyState {
+  icao24: string;
+  callsign: string | null;
+  origin_country: string;
+  time_position: number | null;
+  last_contact: number;
+  longitude: number | null;
+  latitude: number | null;
+  baro_altitude: number | null;
+  on_ground: boolean;
+  velocity: number | null;
+  true_track: number | null;
+  vertical_rate: number | null;
+  sensors: number[] | null;
+  geo_altitude: number | null;
+  squawk: string | null;
+  spi: boolean;
+  position_source: number;
+}
+
+export interface OpenSkyResponse {
+  time: number;
+  states: OpenSkyState[] | null;
+}
+
+export interface FlightData {
+  icao24: string;
+  callsign: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  altitude: number | null;
+  velocity: number | null;
+  on_ground: boolean;
+  last_contact: number;
+}
